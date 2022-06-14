@@ -1,10 +1,221 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const ContainerToCard());
+  runApp(const ListBuilder());
 }
 
+/// 创建可滚动列表 ListView 通过ListView.builder创建 性能好
+class ListBuilder extends StatefulWidget {
+  const ListBuilder({Key? key}) : super(key: key);
 
+  @override
+  State<ListBuilder> createState() => _ListBuilderState();
+}
+
+class _ListBuilderState extends State<ListBuilder> {
+  List<Color> bgColors = [Colors.red,Colors.green,Colors.blue];
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        // body: ListView.builder(
+        //   itemBuilder: (context, index){
+        //     return Container(
+        //       height: 60,
+        //       color: bgColors[index%3],
+        //     );
+        // },itemCount: 100)
+        body: ListView.separated(
+            itemBuilder: (context, index) {
+              return Container(
+                color: bgColors[index%3],
+                height: 50,
+              );
+            },
+            separatorBuilder: (context,index){
+              return const Divider(
+                color: Colors.black,
+                indent: 10,
+                endIndent: 10,
+                thickness:1,
+                height: 1,
+              );
+            },
+            itemCount: 100
+        ),
+      )
+    );
+  }
+}
+
+/// 基础布局小案例 背景图片
+class FoundationLayout2 extends StatefulWidget {
+  const FoundationLayout2({Key? key}) : super(key: key);
+
+  @override
+  State<FoundationLayout2> createState() => _FoundationLayout2State();
+}
+
+class _FoundationLayout2State extends State<FoundationLayout2> {
+  bool beShow = false;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Container(
+          constraints:BoxConstraints.expand(),
+          decoration: const BoxDecoration(
+            image: DecorationImage(
+              fit: BoxFit.fill,
+              image: NetworkImage("https://println-g1-carlos.oss-cn-qingdao.aliyuncs.com/upload/c.jpeg?OSSAccessKeyId=LTAI4G2yHvcj7ZpeHseBQZdH&Expires=1655217962&Signature=OHjApToos4C6mqyQpEtGWSD%2FcYM%3D")
+            )
+          ),
+          child: Container(
+            margin: const EdgeInsets.only(top: 60),
+            child: Column(
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    const Text("周大侠",style: TextStyle(fontSize: 20),),
+                    IconButton(onPressed: (){
+                      setState(() {
+                        beShow = !beShow;
+                      });
+                    }, icon: Icon(beShow?Icons.vertical_align_top_sharp:Icons.vertical_align_bottom_sharp))
+                  ],
+                ),
+                Visibility(
+                  visible: beShow,
+                  child: const Expanded(
+                    child: Text("我一脚踢飞一串串红红的葫芦冰糖\n我一拳打飞一幕幕的回忆散在月光\n一截老老的老姜\n一段旧旧的旧时光\n我可以给你们一张签名照拿去想象\n我说啊 屏风就该遮冰霜\n屋檐就该挡月光\n江湖就该开扇窗\n平剧就该耍花枪\n" +
+                    "扎下马步我不摇晃\n闷了慌了倦了我就穿上功夫装\n我不卖豆腐（豆腐） 豆腐（豆腐）\n我在武功学校里学的那叫功夫\n功夫（功夫） 功夫（功夫）\n赶紧穿上旗袍\n免得你说我吃你豆腐\n你就像豆腐（豆腐） 豆腐（豆腐）\n吹弹可破的肌肤在试练我功夫\n" +
+                    "功夫（功夫） 功夫（功夫）\n赶紧穿上旗袍\n免得你说我吃你豆腐\n我稍微伸展拳脚\n你就滚到边疆\n回旋踢太用力\n画面就变的很荒凉\n落花配对配夕阳\n翻山越岭渡过江\n我清一清嗓\n清一清嗓 唱起秦腔\n飞天飞敦煌 北方北大荒\n谁在水一方我撑起一把纸伞回头望\n" +
+                    "啊这什么地方 这什么状况\n啦啦啦啦 闷了慌了倦了我就踩在你肩膀\n我不卖豆腐（豆腐） 豆腐（豆腐）\n我在武功学校里学的那叫功夫\n功夫（功夫） 功夫（功夫）\n赶紧穿上旗袍\n免得你说我吃你豆腐\n你就像豆腐（豆腐） 豆腐（豆腐）\n" +
+                    "吹弹可破的肌肤在试练我功夫\n功夫（功夫） 功夫（功夫）\n赶紧穿上旗袍\n免得你说我吃你豆腐\n",style: TextStyle(overflow: TextOverflow.ellipsis,fontSize: 15,color: Colors.amber),),
+                  ),
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 基础布局小案例 手机设置界面
+class FoundationLayout1 extends StatefulWidget {
+  const FoundationLayout1({Key? key}) : super(key: key);
+
+  @override
+  State<FoundationLayout1> createState() => _FoundationLayout1();
+}
+
+class _FoundationLayout1 extends State<FoundationLayout1> {
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      title: "Flutter",
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("基础布局小案例"),
+          backgroundColor: Colors.cyan,
+        ),
+        body: Container(
+          color: Colors.grey[200],
+          child: Column(
+            children: [
+              Container(
+                height: 65,
+                margin: const EdgeInsets.only(top: 10),
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                color: Colors.white,
+                child: Row(
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(right: 16),
+                      child: Icon(
+                          Icons.wifi_outlined
+                      ),
+                    ),
+                    Expanded(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          const Text("网络和互联网",style: TextStyle(fontSize: 18)),
+                          Text("WALN,移动网络,流量使用",style: TextStyle(color: Colors.grey[600]),
+                              overflow: TextOverflow.ellipsis //超出部分以省略号代替
+                          )
+                        ],
+                      ),
+                    ),
+                    const Icon(Icons.arrow_right_alt)
+                  ],
+                ),
+              ),
+              Container( //复选框
+                height: 65,
+                margin: const EdgeInsets.only(top: 10),
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16),
+                      child: Text("设置项1",style: TextStyle(fontSize: 18)),
+                    ),
+                    Checkbox(value: true, onChanged: (val){
+
+                    })
+                  ],
+                ),
+              ),
+              Container( //滑块按钮
+                height: 65,
+                margin: const EdgeInsets.only(top: 10),
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Text("是否开启蓝牙",style: TextStyle(fontSize: 18),),
+                    ),
+                    Switch(value: true, onChanged: (val){
+
+                    })
+                  ],
+                ),
+              ),
+              Container( //滑块按钮
+                height: 65,
+                margin: const EdgeInsets.only(top: 10),
+                color: Colors.white,
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    const Padding(
+                      padding: EdgeInsets.only(left: 16.0),
+                      child: Text("调节音量",style: TextStyle(fontSize: 18),),
+                    ),
+                    Slider(value: 10,max: 100,min: 1, onChanged: (val){
+
+                    }),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
 
 /// 使用Container替代Card实现卡片效果 使用层叠布局加水印
 class ContainerToCard extends StatelessWidget {
