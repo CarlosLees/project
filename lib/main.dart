@@ -1,11 +1,331 @@
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
 void main() {
-  runApp(const ListBuilder());
+  runApp(const ElementMove());
+}
+
+/// 使用Stack布局实现滑块滚动效果 获取全局Key 从全局Key中得到屏幕宽高
+class ElementMove extends StatefulWidget {
+  const ElementMove({Key? key}) : super(key: key);
+
+  @override
+  State<ElementMove> createState() => _ElementMoveState();
+}
+
+class _ElementMoveState extends State<ElementMove> {
+  double _left = 0.0;
+  double _top = 0.0;
+
+  double maxWidth = 0.0;
+  double maxHeight = 0.0;
+
+  GlobalKey globalKey = GlobalKey();
+
+  @override
+  void initState() {
+    WidgetsBinding.instance?.addPostFrameCallback((_) {
+      maxWidth = (globalKey.currentContext?.size?.width ?? 0.0);
+      maxHeight = (globalKey.currentContext?.size?.height ?? 0.0);
+    });
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("ElementMove"),
+          backgroundColor: Colors.orangeAccent,
+        ),
+        body: Container(
+          child: GestureDetector(
+            onPanUpdate: (DragUpdateDetails details){
+              setState(() {
+                if(_left + 200 > maxWidth) {
+                  _left = maxWidth - 200;
+                }else if (_left < 0){
+                  _left = 0;
+                }else{
+                  _left += details.delta.dx;
+                }
+
+                if(_top + 200 > maxHeight){
+                  _top = maxHeight - 200;
+                }else if(_top < 0){
+                  _top = 0;
+                }else{
+                  _top += details.delta.dy;
+                }
+              });
+            },
+            child: Stack(
+              key: globalKey,
+              children: [
+                Positioned(
+                  width: 200,
+                  height: 200,
+                  left: _left,
+                  top: _top,
+                  child: Container(
+                    color: Colors.redAccent,
+                  )
+                )
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+
+///使用Container实现一个按钮效果
+///要想水波纹效果出现在已设置的颜色上 必须使用InkWell控件在InkWell中实现时间 并且将颜色等设置在InkWell的上层组件Ink的decoration中
+///如果要调整Ink的位置等 必须要在Ink外层再包裹一个能修改位置的空间 如Container
+class MyTextField extends StatefulWidget {
+  const MyTextField({Key? key}) : super(key: key);
+
+  @override
+  State<MyTextField> createState() => _MyTextFieldState();
+}
+
+class _MyTextFieldState extends State<MyTextField> {
+
+  bool beClick = true;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("Flutter Widget"),
+        ),
+        body: Container(
+          margin: const EdgeInsets.symmetric(vertical: 15,horizontal: 20),
+          child: Ink(
+            height: 40,
+            decoration: BoxDecoration(
+              color: Colors.orange,
+              borderRadius: BorderRadius.circular(10),
+              gradient:const LinearGradient(
+                  colors: [Colors.orange,Colors.deepOrange,Colors.orangeAccent]
+              )
+            ),
+            child: InkWell(
+              onTap: (){
+                setState(() {
+                  beClick = !beClick;
+                });
+              },
+              child: Container(
+                alignment: Alignment.center,
+                child: Text(
+                  beClick?"确定":"取消",
+                  style: const TextStyle(
+                    color: Colors.white,
+                    fontSize: 20
+                  ),
+                ),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+///单选框和复选框
+///复选框根据value的值来确定是否选中 true和false
+///单选框根据value的值和groupValue的值是否相等来确定是否选中
+class BasicControl extends StatefulWidget {
+  const BasicControl({Key? key}) : super(key: key);
+
+  @override
+  State<BasicControl> createState() => _BasicControlState();
+}
+
+class _BasicControlState extends State<BasicControl> {
+
+  bool _beCheck = false;
+  int _groupVal = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          title: const Text("Flutter Widget"),
+          backgroundColor: Colors.amber,
+        ),
+        body: Container(
+          margin: const EdgeInsets.all(10),
+          child: Column(
+            children: [
+              //多选框
+              Row(
+                children: [
+                  const Text("唱歌"),
+                  Checkbox(value: _beCheck, onChanged: (val){
+                    setState(() {
+                      _beCheck = !_beCheck;
+                    });
+                  }),
+                  Text("$_beCheck")
+                ],
+              ),
+              Row(
+                children: [
+                  //单选框 value和groupValue相等时 单选框是选中状态
+                  const Text("性别"),
+                  const Text("男"),
+                  Radio(value: 1, groupValue: _groupVal, onChanged: (val){
+                    setState(() {
+                      _groupVal = val as int;
+                    });
+                  }),
+                  const Text("女"),
+                  Radio(value: 2, groupValue: _groupVal, onChanged: (val){
+                    setState(() {
+                      _groupVal = val as int;
+                    });
+                  }),
+                  Text("$_groupVal")
+                ],
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+}
+
+/// 栈布局IndexedStack 元素覆盖 可以指定具体哪个元素在最上面 可以做一个选项卡
+class MyIndexedStack extends StatefulWidget {
+  const MyIndexedStack({Key? key}) : super(key: key);
+
+  @override
+  State<MyIndexedStack> createState() => _MyIndexedStackState();
+}
+
+class _MyIndexedStackState extends State<MyIndexedStack> {
+
+  int _index = 0;
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        body: Column(
+          children: [
+            //第一个元素
+            Expanded(
+              child: IndexedStack(
+                index: _index,
+                children: [
+                  Container(
+                    color: Colors.red,
+                  ),
+                  Container(
+                    color: Colors.blue,
+                  ),
+                  Container(
+                    color: Colors.green,
+                  )
+                ],
+              ),
+            ),
+            Container(
+              margin: const EdgeInsets.only(bottom: 20),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  IconButton(onPressed: () => onClick(0), icon: const Icon(Icons.looks_one),),
+                  IconButton(onPressed: () => onClick(1), icon: const Icon(Icons.looks_two),),
+                  IconButton(onPressed: () => onClick(2), icon: const Icon(Icons.looks_3),)
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
+  void onClick(index){
+    setState(() {
+      _index = index;
+    });
+  }
+}
+
+/// GridView创建网格类型列表 3种创建方式
+/// count可以指定横轴的数量
+/// extent可以指定每个元素大小来根据屏幕大小动态创建
+/// build 性能最好的创建方式 可以使用以上两种方式
+class MyGridView extends StatefulWidget {
+  const MyGridView({Key? key}) : super(key: key);
+
+  @override
+  State<MyGridView> createState() => _MyGridViewState();
+}
+
+class _MyGridViewState extends State<MyGridView> {
+
+  List<Color> bgColors = [Colors.red,Colors.green,Colors.blue,Colors.deepPurple];
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      home: Scaffold(
+        appBar: AppBar(
+          backgroundColor: Colors.amber,
+        ),
+        // body: GridView.count(
+        //   crossAxisCount: 3, //每一列的元素个数
+        //   crossAxisSpacing: 5, //交叉轴元素之间的间距 默认纵轴为主轴 横轴为交叉轴
+        //   mainAxisSpacing: 5, //主轴之间元素的间距
+        //   children: List.generate(120, (index){ //12个色块元素
+        //     return Container(
+        //       color: Colors.green,
+        //     );
+        //   }),
+        // ),
+        // body: GridView.extent(
+        //   maxCrossAxisExtent: 150,//代表每个元素所占位置大小 会自动根据屏幕大小和所占大小来分配元素个数 动态计算
+        //   crossAxisSpacing: 4,
+        //   mainAxisSpacing: 4,
+        //   children: List.generate(10, (index) {
+        //     return Container(
+        //       color: Colors.green,
+        //     );
+        //   })
+        // ),
+
+        body: GridView.builder( //性能最好的创建方式 gridDelegate可以使用count和extent两种类型创建
+            itemCount: 199,
+            gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              mainAxisSpacing: 4,
+              crossAxisSpacing: 4,
+            ),
+            itemBuilder: (context,index){
+              return Container(
+                alignment: Alignment.center,
+                color: bgColors[index%4],
+                child: Text("$index"),
+              );
+            }
+        ),
+      ),
+    );
+  }
 }
 
 /// 创建可滚动列表 ListView 通过ListView.builder创建 性能好
+/// ListView.separated 创建分割线
 class ListBuilder extends StatefulWidget {
   const ListBuilder({Key? key}) : super(key: key);
 
@@ -66,7 +386,7 @@ class _FoundationLayout2State extends State<FoundationLayout2> {
     return MaterialApp(
       home: Scaffold(
         body: Container(
-          constraints:BoxConstraints.expand(),
+          constraints:const BoxConstraints.expand(),
           decoration: const BoxDecoration(
             image: DecorationImage(
               fit: BoxFit.fill,
@@ -285,7 +605,7 @@ class ContainerToCard extends StatelessWidget {
   }
 }
 
-/// Stack 层叠布局
+/// Stack 层叠布局 使用Positioned处理相对位置 使用Align调整绝对位置
 class MyStackApp extends StatelessWidget {
   const MyStackApp({Key? key}) : super(key: key);
 
